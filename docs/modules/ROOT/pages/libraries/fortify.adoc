@@ -1,0 +1,215 @@
+= Fortify
+
+The Fortify library leverages the official https://plugins.jenkins.io/fortify/[Fortify Jenkins plugin] to run code security scans and assessments.
+
+== Steps Contributed
+
+.Steps
+|===
+| *Step* | *Description*
+
+| ``run_fortify_assessments()``
+| executes the Fortify steps defined for the given project(s)
+
+|===
+
+== Library Configuration Options
+
+.General Configuration Options
+|===
+| *Field* | *Type* | *Description* | *Default Value*
+
+| steps
+| List _(required)_
+| Fortify steps to run, from the following options: *update, clean, translate, scan, upload*
+|
+| buildID
+| String _(required for: *clean, translate, scan*)_
+| A unique identifier for the scan.
+| 
+| projectScanType
+| String _(required for: *translate*)_
+| The project scan type is *one* of the following: *fortifyAdvanced, fortifyDevenv, fortifyDotnetSrc, fortifyGradle, fortifyJava, fortifyMaven3, fortifyMSBuild, or fortifyOther*.
+|
+| appName
+| String _(required for: *upload*)_
+| Specifies the application name for which to store the results in Fortify Software Security Center.
+| 
+| appVersion
+| String _(required for: *upload*)_
+| Specifies the application version for which to store the results in Fortify Software Security Center.
+| 
+| updateServerURL
+| String _(optional)_
+| Specifies the URL for the Fortify Rulepack update server.
+| https://update.fortify.com 
+| locale
+| String _(optional)_
+| Specifies the locale for the Fortify Rulepack. Use *one* of the following locale codes: English: *en* / Chinese (Simplified): *zh_CN* / Chinese (Traditional): *zh_TW* / Portuguese (Brazil): *pt_BR* / Korean: *ko* / Spanish: *es*
+| en
+| maxHeap
+| Integer _(optional)_
+| The maximum heap size for the JVM (-Xmx).
+| (automatically allocated based on physical memory available on system)
+| addJVMOptions
+| String _(optional)_
+| Additional JVM commands.
+| (none)
+| debug
+| Boolean _(optional)_
+| Specifies whether to include debug information in the Fortify Support log file.
+| false
+| verbose
+| Boolean _(optional)_
+| Specifies whether to send verbose status messages to the console and to the Fortify Support log file.
+| false
+| logFile
+| String _(optional)_
+| Specifies the log file location and file name.
+| The default file name is sca.log and the default location is the workspace directory.
+| excludeList
+| String _(optional)_
+| Specifies a list of directories or files to exclude from translation.
+| (none)
+| resultsFile
+| String _(optional)_
+| Specifies a name for the Fortify results file.
+| scan.fpr
+| customRulepacks
+| String _(optional)_
+| Specifies custom rules (XML files).
+| (none)
+| addOptions
+| String _(optional)_
+| Specifies any additional scan options. Enclose each option and parameter in double quotes.
+| (none)
+| filterSet
+| String _(optional)_
+| Specifies the ID of a filter set to use when retrieving scan results for display in Jenkins.
+| The default filter set configured in Fortify Software Security Center.
+| failureCriteria
+| String _(optional)_
+| Specifies a search query to use on the scan results to trigger a build failure. For example, [fortify priority order]:critical.
+| (none)
+| pollingInterval
+| Integer _(optional)_
+| Specifies the interval (in minutes) at which the Fortify Jenkins Plugin polls Fortify Software Security Center to determine if the FPR processing is complete. The valid values are 0-60.
+| 1
+
+|===
+
+.Project Type-Specific Configuration Options
+|===
+| *Field* | *Type* | *Description* | *Default Value*
+
+| javaSrcFiles
+| String _(required for: *fortifyJava*)_
+| Specifies the location of the Java source files.
+| 
+| javaVersion
+| String _(optional)_
+| Specifies the JDK version for which the Java code is written.
+| (Default is defined by the Fortify Static Code Analyzer version.)
+| javaClasspath
+| String _(optional)_
+| Specifies the class path as a colon- or semicolon-separated list of directories to use for analyzing Java source code.
+| (none)
+| javaAddOptions
+| String _(optional)_
+| Specifies any additional Fortify Static Code Analyzer options for translating Java code.
+| (none)
+| dotnetProject
+| String _(required for: *fortifyDevenv, fortifyMSBuild*)_
+| Specifies a solution (\*.sln) or a project (*.proj) file.
+| 
+| dotnetFrameworkVersion
+| Integer _(required for: *fortifyDotnetSrc*)_
+| Specifies the .NET framework version.
+| 
+| dotnetSrcFiles
+| String _(required for: *fortifyDotnetSrc*)_
+| Specifies the location of the .NET source files.
+| 
+| dotnetLibdirs
+| String _(optional)_
+| Specifies a semicolon-separated list of directories where referenced system or third-party DLLs are located.
+| (none)
+| dotnetAddOptions
+| String _(optional)_
+| Specifies any additional Fortify Static Code Analyzer options for translating .NET code, or devenv or MSBuild options required.
+| (none)
+| mavenOptions
+| String _(optional)_
+| Specifies any additional Maven options required for your project.
+| (none)
+| gradleTasks
+| String _(required for: *fortifyGradle*)_
+| Specifies the Gradle tasks required for your project.
+| 
+| useWrapper
+| Boolean _(optional)_
+| Specifies whether to use a Wrapper.
+| false
+| gradleOptions
+| String _(optional)_
+| Specifies any additional Gradle options required for your project.
+| (none)
+| otherIncludesList
+| String _(required for: *fortifyOther*)_
+| Specifies the location of the  source files.
+| 
+| otherOptions
+| String _(optional)_
+| Specifies any additional Fortify Static Code Analyzer options required for your project.
+| (none)
+| advOptions
+| String _(required for: *fortifyAdvanced)_
+| Specifies all the Fortify Static Code Analyzer options that are necessary to translate the project.
+| 
+
+|===
+
+[source,groovy]
+----
+libraries{
+  fortify{
+    run_fortify_assessments{
+      myJavaProject{
+        steps = ['update', 'clean', 'translate', 'scan', 'upload']
+        buildID = "spanish_inq"
+        projectScanType = "fortifyJava"
+        javaSrcFiles = "src"
+        appName = "Project Testing"
+        appVersion = "0.0.1"
+      }
+      myPythonCode{
+        steps = ['clean','translate','scan','upload']
+        buildID = "blk_adder"
+        logFile = "python-app-scan.log"
+        excludeList = '"src/**/Test*.py"'
+        projectScanType = "fortifyAdvanced"
+        advOptions = '"-python-version" "3" "-python-path" "/usr/bin" "src/main/pythonApp"'
+        appName = "Python Subproject"
+        appVersion = "1.2.3"
+        verbose = true
+      }
+    }
+  }
+}
+----
+
+== Results
+
+< a description of how the results are captured in the pipeline >
+< if there are multiple artifacts generated, create H3s to describe the artifact and optionally an image >
+
+=== < artifact 1 >
+
+// image:<library_name>/<picture>.jpg
+
+== External Dependencies
+
+* Fortify Jenkins plugin, which requires:
+** Fortify Software Security Center (SSC)
+
+== Troubleshooting
