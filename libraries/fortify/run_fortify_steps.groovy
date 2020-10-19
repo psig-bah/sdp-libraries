@@ -49,7 +49,7 @@ void call(projectName, projectConfig){
         //add step-appropriate parameters
         projectConfig.each{ parameter, value ->
           if (stepParameters[step].contains(parameter)) {
-            if (step == "translate") && (parameter == "projectScanType") {
+            if ((step == "translate") && (parameter == "projectScanType")) {
               scanType = "${parameter}: ${value}"
             } else if (step == "translate") {
               scanParams += "${parameter}: '${value}', "

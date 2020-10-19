@@ -59,7 +59,7 @@ def fortify_validation(projectConfig){
   }
 
   //for different translations
-  if (projectConfig.hasVariable('projectScanType') { 
+  if (projectConfig.hasVariable('projectScanType')) { 
     //Java      
     if (projectConfig.projectScanType == 'fortifyJava') {
       assert projectConfig.hasVariable('javaSrcFiles')
