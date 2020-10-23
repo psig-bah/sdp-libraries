@@ -106,7 +106,7 @@ def fortify_validation(projectConfig){
             'dotnetProject','dotnetFrameworkVersion','dotnetSrcFiles','dotnetLibdirs',
             'dotnetAddOptions','mavenOptions','gradleTasks','useWrapper',
             'gradleOptions','otherIncludesList','otherOptions','advOptions']
-  projectConfig.each{ field ->
+  projectConfig.each{ field, value ->
     assert fieldList.contains(field)
   }
 }
