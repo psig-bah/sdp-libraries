@@ -26,8 +26,7 @@ void call(){
 def fortify_validation(projectConfig){
   //(semi-)Required fields
   //steps
-  assert projectConfig.hasVariable('steps')
-  assert projectConfig.steps.size() > 0
+  assert projectConfig.steps
   def stepList = ['update','clean','translate','scan','upload']
   projectConfig.steps.each{ step ->
     assert stepList.contains(step) 
@@ -37,12 +36,12 @@ def fortify_validation(projectConfig){
   if (projectConfig.steps.contains('clean') ||
       projectConfig.steps.contains('translate') ||
       projectConfig.steps.contains('scan')) {
-        assert projectConfig.hasVariable('buildID')
+        assert projectConfig.buildID
   }
 
   //projectScanType
   if (projectConfig.steps.contains('translate')) {
-    assert projectConfig.hasVariable('projectScanType')
+    assert projectConfig.projectScanType
     assert ['fortifyAdvanced','fortifyDevenv','fortifyDotnetSrc',
             'fortifyGradle','fortifyJava','fortifyMaven3','fortifyMSBuild',
             'fortifyOther'].contains(projectConfig.projectScanType)
@@ -50,51 +49,51 @@ def fortify_validation(projectConfig){
 
   //appName
   if (projectConfig.steps.contains('upload')) {
-    assert projectConfig.hasVariable('appName')
+    assert projectConfig.appName
   }
 
   //appVersion
   if (projectConfig.steps.contains('upload')) {
-    assert projectConfig.hasVariable('appVersion')
+    assert projectConfig.appVersion
   }
 
   //for different translations
-  if (projectConfig.hasVariable('projectScanType')) { 
+  if (projectConfig.projectScanType) { 
     //Java      
     if (projectConfig.projectScanType == 'fortifyJava') {
-      assert projectConfig.hasVariable('javaSrcFiles')
+      assert projectConfig.javaSrcFiles
     }
 
     //devenv/MSBuild
     if (['fortifyDevenv','fortifyMSBuild'].contains(projectConfig.projectScanType)) {
-      assert projectConfig.hasVariable('dotnetProject')
+      assert projectConfig.dotnetProject
     }
 
     //.NET
     if (projectConfig.projectScanType == 'fortifyDotnetSrc') {
-      assert projectConfig.hasVariable('dotnetFrameworkVersion')
-      assert projectConfig.hasVariable('dotnetSrcFiles')
+      assert projectConfig.dotnetFrameworkVersion
+      assert projectConfig.dotnetSrcFiles
     }
 
     //Gradle
     if (projectConfig.projectScanType == 'fortifyGradle') {
-      assert projectConfig.hasVariable('gradleTasks')
+      assert projectConfig.gradleTasks
     }
 
     //Other
     if (projectConfig.projectScanType == 'fortifyOther') {
-      assert projectConfig.hasVariable('otherIncludesList')
+      assert projectConfig.otherIncludesList
     }
 
     //Advanced
     if (projectConfig.projectScanType == 'fortifyAdvanced') {
-      assert projectConfig.hasVariable('advOptions')
+      assert projectConfig.advOptions
     }
   }
 
   //Optional fields
   //locale
-  if (projectConfig.hasVariable('locale')) {
+  if (projectConfig.locale) {
     assert ['en','zh_CN','zh_TW','pt_BR','ko','es'].contains(projectConfig.locale)
   }
 
