@@ -8,7 +8,7 @@ void call(){
   def projects = [:]
   
   //get set of projects and their configs
-  config.each{ projectName, projectConfig ->
+  config.run_fortify_assessments.each{ projectName, projectConfig ->
 
     //validate config
     fortify_validation(projectConfig)
