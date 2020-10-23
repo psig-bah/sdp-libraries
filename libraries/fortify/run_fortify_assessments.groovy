@@ -4,9 +4,9 @@
 */
 
 void call(){
-  
+
   def projects = [:]
-  
+
   //get set of projects and their configs
   config.run_fortify_assessments.each{ projectName, projectConfig ->
 
@@ -29,7 +29,7 @@ def fortify_validation(projectConfig){
   assert projectConfig.steps
   def stepList = ['update','clean','translate','scan','upload']
   projectConfig.steps.each{ step ->
-    assert stepList.contains(step) 
+    assert stepList.contains(step)
   }
 
   //buildID
@@ -58,8 +58,8 @@ def fortify_validation(projectConfig){
   }
 
   //for different translations
-  if (projectConfig.projectScanType) { 
-    //Java      
+  if (projectConfig.projectScanType) {
+    //Java
     if (projectConfig.projectScanType == 'fortifyJava') {
       assert projectConfig.javaSrcFiles
     }

@@ -4,12 +4,10 @@
 */
 
 void call(projectName, projectConfig){
-  
+
   //get steps in order
-  def stepOrder = ['update', 'clean', 'translate', 'scan', 'upload'] 
-  def sortedSteps = projectConfig.steps.sort{ a,b -> 
-                      stepOrder.indexOf(a) <=> stepOrder.indexOf(b) }
-  
+  def sortedSteps = sort_steps(projectConfig.steps)
+
   //parameter <-> step associations
   def stepParameters = [
     'update':['updateServerURL','locale'],
@@ -41,7 +39,7 @@ void call(projectName, projectConfig){
 
     sortedSteps.each{ step ->
       stage('Fortify: ' + projectName + '::' + step){
-        
+
         String command = "fortify" + step.capitalize()
         String scanType = ""
         String scanParams = ""
@@ -51,7 +49,7 @@ void call(projectName, projectConfig){
           if (stepParameters[step].contains(parameter)) {
             if ((step == "translate") && (parameter == "projectScanType")) {
               scanType = "${parameter}: ${value}"
-            } else if (step == "translate") {
+            } else if ((step == "translate") && (scanParameters.contains(parameter))) {
               scanParams += "${parameter}: '${value}', "
             } else {
               command += " ${parameter}: '${value}',"
@@ -61,15 +59,32 @@ void call(projectName, projectConfig){
 
         //string cleanup
         if (step == "translate") {
-          scanParams = scanParams[0..-2]
+          scanParams = scanParams[0..-3]
           command += " $scanType($scanParams)"
         } else if (command[-1] == ",") {
           command = command[0..-2]
         }
-        
-        //run it  
+
+        //empty fortifyUpdate fix
+        //while it doesn't have any required parameters, trying to run
+        //'fortifyUpdate' alone errors out?
+        if (command == "fortifyUpdate") {
+          command += " updateServerURL: 'https://update.fortify.com'"
+        }
+
+        //run it
         evaluate command
       }
     }
   }
+}
+
+@NonCPS
+def sort_steps(steps){
+
+  //return steps in order
+  def stepOrder = ['update', 'clean', 'translate', 'scan', 'upload']
+
+  return steps.sort{ a,b -> stepOrder.indexOf(a) <=> stepOrder.indexOf(b) }
+
 }
